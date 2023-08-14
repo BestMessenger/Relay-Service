@@ -1,0 +1,21 @@
+spring:
+  cassandra:
+    schema-action: create_if_not_exists
+    connection:
+      connect-timeout: 10s
+      init-query-timeout: 10s
+    local-datacenter: datacenter1
+    keyspace-name: relay_service
+  application:
+    name: relay_service
+
+server:
+  port: 4000
+
+logging:
+  level:
+    root=INFO:
+
+springdoc:
+  swagger-ui:
+    path: /message-service/api/documentation
