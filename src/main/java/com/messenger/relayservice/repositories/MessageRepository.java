@@ -24,4 +24,8 @@ public interface MessageRepository extends CrudRepository<MessageModel, MessageK
             "AND groupId = :groupId")
     void deleteBySentToIdAndSentFromIdAndTimestampGreaterThanAndGroupId(
             int sentToId, int sentFromId, Instant timestamp, int groupId);
+    
+    @Transactional
+    @Query("SELECT * FROM messages WHERE groupId = :groupId")
+    List<MessageModel> findMessagesByGroupId(int groupId);
 }

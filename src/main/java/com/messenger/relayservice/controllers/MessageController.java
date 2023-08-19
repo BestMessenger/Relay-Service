@@ -56,7 +56,7 @@ public class MessageController {
                                                          @PathVariable int sentFromId,
                                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant timestamp,
                                                          @PathVariable("group_id") int groupId) {
-        MessageKeyModel key = new MessageKeyModel(sentToId, sentFromId, timestamp, groupId);
+        MessageKeyModel key = new MessageKeyModel(timestamp, groupId);
         Optional<MessageModel> message = messageService.getMessage(key);
         return message.map(value -> new ResponseEntity<>(convertMessageToResponseDTO(value), HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -89,7 +89,7 @@ public class MessageController {
             @ApiResponse(responseCode = "404", description = "Messages not found")
     })
     @GetMapping("/group/{sent_from_id}/{sent_to_id}/{groupId}")
-    public ResponseEntity<List<MessageResponseDTO>> getMessageByGroupId(
+    public ResponseEntity<List<MessageResponseDTO>> getMessageByGroupIdAndSent_from_id(
             @PathVariable int groupId,
             @PathVariable("sent_from_id") int sentFromId,
             @PathVariable("sent_to_id") int sentToId) {
@@ -112,12 +112,11 @@ public class MessageController {
     private MessageModel convertRequestDTOToMessage(MessageRequestDTO requestDTO) {
         MessageModel messageModel = new MessageModel();
         MessageKeyModel key = new MessageKeyModel();
-        key.setSent_to_id(requestDTO.getSentToId());
-        key.setSent_from_id(requestDTO.getSentFromId());
         key.setTimestamp(requestDTO.getTimestamp().toInstant(ZoneOffset.UTC));
         key.setGroupId(requestDTO.getGroupId());
-
         messageModel.setKey(key);
+        messageModel.setSent_to_id(requestDTO.getSentToId());
+        messageModel.setSent_from_id(requestDTO.getSentFromId());
         messageModel.setMessageId(requestDTO.getMessageId());
         messageModel.setContent_type(requestDTO.getContent_type());
         messageModel.setMedia_url(requestDTO.getMedia_url());
@@ -127,8 +126,8 @@ public class MessageController {
 
     private MessageResponseDTO convertMessageToResponseDTO(MessageModel message) {
         MessageResponseDTO responseDTO = new MessageResponseDTO();
-        responseDTO.setSentToId(message.getKey().getSent_to_id());
-        responseDTO.setSentFromId(message.getKey().getSent_from_id());
+        responseDTO.setSentToId(message.getSent_to_id());
+        responseDTO.setSentFromId(message.getSent_from_id());
         responseDTO.setTimestamp(message.getKey().getTimestamp().toString());
         responseDTO.setMessageId(message.getMessageId());
         responseDTO.setContent_type(message.getContent_type());
@@ -144,5 +143,28 @@ public class MessageController {
             responseDTOs.add(convertMessageToResponseDTO(message));
         }
         return responseDTOs;
+    }
+
+    @Operation(summary = "Get messages by group ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of messages",
+                    content = @Content(schema = @Schema(implementation = List.class))),
+            @ApiResponse(responseCode = "404", description = "Messages not found")
+    })
+    @GetMapping("/{group_id}")
+    public ResponseEntity<Object> getMessagesByGroupId(@PathVariable("group_id") int groupId) {
+        List<MessageModel> message = messageService.getMessagesByGroupId(groupId);
+
+        List<ResponseEntity<MessageResponseDTO>> responseList = message.stream()
+                .map(value -> new ResponseEntity<>(convertMessageToResponseDTO(value), HttpStatus.OK))
+                .collect(Collectors.toList());
+
+        if (responseList.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return ResponseEntity.ok(responseList.stream()
+                .map(ResponseEntity::getBody)
+                .collect(Collectors.toList()));
     }
 }

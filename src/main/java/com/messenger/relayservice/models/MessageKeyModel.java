@@ -14,11 +14,6 @@ import java.time.Instant;
 @AllArgsConstructor
 @PrimaryKeyClass
 public class MessageKeyModel {
-
-    @PrimaryKeyColumn(type = PrimaryKeyType.PARTITIONED)
-    private int sent_to_id;
-    @PrimaryKeyColumn(type = PrimaryKeyType.PARTITIONED)
-    private int sent_from_id;
     @PrimaryKeyColumn(type = PrimaryKeyType.CLUSTERED)
     private Instant timestamp;
     @PrimaryKeyColumn(type = PrimaryKeyType.PARTITIONED)

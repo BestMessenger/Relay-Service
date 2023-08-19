@@ -45,4 +45,8 @@ public class MessageService {
         Instant startOf2021 = Instant.ofEpochMilli(1609459200000L);
         return messageRepository.findBySentToIdAndSentFromIdAndTimestampGreaterThanAndGroupId(sentToId, sentFromId, startOf2021, groupId);
     }
+
+    public List<MessageModel> getMessagesByGroupId (int groupId) {
+        return messageRepository.findMessagesByGroupId(groupId);
+    }
 }
