@@ -1,14 +1,21 @@
-server:
-  port: 4000
-  servlet:
-    context-path: /relay-service
-
-# Spring Data Configuration for Cassandra
+#server:
+#  port: 4000
+#  servlet:
+#    context-path: /relay-service
+#
+## Spring Data Configuration for Cassandra
+#spring:
+#  data:
+#    cassandra:
+#      keyspace-name: relay_service
+##      contact-points: apache-cassandra
+#      contact-points: localhost
+#      schema-action: create_if_not_exists
+#      local-datacenter: datacenter1
+#      entity-base-package: com.messenger.relayservice.models
 spring:
-  data:
-    cassandra:
-      keyspace-name: relay_service
-      contact-points: apache-cassandra
-      schema-action: create_if_not_exists
-      local-datacenter: datacenter1
-      entity-base-package: com.messenger.relayservice.models
+  application:
+    name: relay-service
+
+  config:
+    import: optional:configserver:http://localhost:8888
