@@ -1,21 +1,36 @@
-#server:
-#  port: 4000
-#  servlet:
-#    context-path: /relay-service
-#
-## Spring Data Configuration for Cassandra
-#spring:
-#  data:
-#    cassandra:
-#      keyspace-name: relay_service
-##      contact-points: apache-cassandra
-#      contact-points: localhost
-#      schema-action: create_if_not_exists
-#      local-datacenter: datacenter1
-#      entity-base-package: com.messenger.relayservice.models
 spring:
   application:
     name: relay-service
+  data:
+    cassandra:
+      keyspace-name: lastSeen_service
+      contact-points: apache-cassandra
+      schema-action: create_if_not_exists
+      local-datacenter: datacenter1
+      entity-base-package: com.messenger.groupservice.models
 
-  config:
-    import: optional:configserver:http://localhost:8888
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+springdoc:
+  packagesToScan: com.messenger.relayservice
+server:
+  port: 4000
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-service:8761/eureka
+
+
+
