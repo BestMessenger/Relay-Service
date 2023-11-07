@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: relay-service
+  data:
+    cassandra:
+      keyspace-name: lastSeen_service
+      contact-points: apache-cassandra
+      schema-action: create_if_not_exists
+      local-datacenter: datacenter1
+      entity-base-package: com.messenger.groupservice.models
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+springdoc:
+  packagesToScan: com.messenger.relayservice
+server:
+  port: 4000
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+
+
